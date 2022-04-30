@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { NavLink, Routes, Route, useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { axiosWithAuth } from '../axios';
+import { axiosWithAuth } from '../axios/index.js';
 import Articles from './Articles'
 import LoginForm from './LoginForm'
 import Message from './Message'
@@ -65,6 +65,18 @@ export default function App() {
     setSpinnerOn(true);
 
     // and launch an authenticated request to the proper endpoint.
+    axiosWithAuth().get(articlesUrl)
+      .then(res => {
+        setArticles(res.data.articles);
+        setMessage(res.data.message);
+      })
+      .catch(err => {
+        if (err.status === 401) {
+          redirectToLogin();
+        }
+      });
+
+    setSpinnerOn(false);
     // On success, we should set the articles in their proper state and
     // put the server success message in its proper state.
     // If something goes wrong, check the status of the response:
@@ -91,8 +103,8 @@ export default function App() {
   return (
     // ✨ fix the JSX: `Spinner`, `Message`, `LoginForm`, `ArticleForm` and `Articles` expect props ❗
     <React.StrictMode>
-      <Spinner />
-      <Message />
+      <Spinner on={spinnerOn} />
+      <Message message={message} />
       <button id="logout" onClick={logout}>Logout from app</button>
       <div id="wrapper" style={{ opacity: spinnerOn ? "0.25" : "1" }}> {/* <-- do not change this line */}
         <h1>Advanced Web Applications</h1>
@@ -105,7 +117,7 @@ export default function App() {
           <Route path="articles" element={
             <>
               <ArticleForm />
-              <Articles />
+              <Articles getArticles={getArticles} articles={articles} setArticles={setArticles} />
             </>
           } />
         </Routes>
