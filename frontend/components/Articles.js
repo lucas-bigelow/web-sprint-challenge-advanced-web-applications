@@ -22,6 +22,15 @@ export default function Articles(props) {
     getArticles();
   }, [])
 
+  const editArticle = (evt, art_id) => {
+    evt.preventDefault();
+    setCurrentArticleId(art_id);
+  }
+
+  const deleteCurrentArticle = (evt, art_id) => {
+    evt.preventDefault();
+    deleteArticle(art_id);
+  }
   return (
     // ✨ fix the JSX: replace `Function.prototype` with actual functions
     // and use the articles prop to generate articles
@@ -39,8 +48,8 @@ export default function Articles(props) {
                   <p>Topic: {art.topic}</p>
                 </div>
                 <div>
-                  <button disabled={true} onClick={Function.prototype}>Edit</button>
-                  <button disabled={true} onClick={Function.prototype}>Delete</button>
+                  <button onClick={(e) => editArticle(e, art.article_id)}>Edit</button>
+                  <button onClick={(e) => deleteCurrentArticle(e, art.article_id)}>Delete</button>
                 </div>
               </div>
             )

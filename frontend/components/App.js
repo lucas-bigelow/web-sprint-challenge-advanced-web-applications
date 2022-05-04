@@ -33,6 +33,11 @@ export default function App() {
     // and a message saying "Goodbye!" should be set in its proper state.
     // In any case, we should redirect the browser back to the login screen,
     // using the helper above.
+    if(localStorage.getItem('token')) {
+      localStorage.removeItem('token');
+      setMessage('Goodbye!')
+    }
+    redirectToLogin();
   }
 
   const login = ({ username, password }) => {
@@ -89,15 +94,47 @@ export default function App() {
     // The flow is very similar to the `getArticles` function.
     // You'll know what to do! Use log statements or breakpoints
     // to inspect the response from the server.
+    setMessage('');
+    setSpinnerOn(true);
+
+    axiosWithAuth().post(articlesUrl, article)
+      .then(res => {
+        setArticles([...articles, res.data.article]);
+        setMessage(res.data.message);
+        setSpinnerOn(false);
+        console.log('HITTTT')
+      })
+      .catch(err => {
+        if (err.status === 401) {
+          redirectToLogin();
+        }
+      }) 
   }
 
   const updateArticle = ({ article_id, article }) => {
     // ✨ implement
     // You got this!
+    setMessage('');
+    setSpinnerOn(true);
+
+    axiosWithAuth().put(`${articlesUrl}/${article_id}`, article)
+      .then(res => {
+        setMessage(res.data.message);
+        setSpinnerOn(false);
+      })
   }
 
   const deleteArticle = article_id => {
     // ✨ implement
+    setMessage('');
+    setSpinnerOn(true);
+
+    axiosWithAuth().delete(`${articlesUrl}/${article_id}`)
+      .then(res => {
+        setMessage(res.data.message);
+        setArticles([...articles].filter(article => article_id !== article.article_id))
+        setSpinnerOn(false);
+      })
   }
 
   return (
@@ -116,8 +153,19 @@ export default function App() {
           <Route path="/" element={<LoginForm login={login}/>} />
           <Route path="articles" element={
             <>
-              <ArticleForm />
-              <Articles getArticles={getArticles} articles={articles} setArticles={setArticles} />
+              <ArticleForm 
+                currentArticle={articles[currentArticleId]}
+                postArticle={postArticle}
+                updateArticle={updateArticle} 
+                setCurrentArticleId={setCurrentArticleId}
+              />
+              <Articles 
+                getArticles={getArticles} 
+                articles={articles} 
+                deleteArticle={deleteArticle} 
+                currentArticleId={currentArticleId}
+                setCurrentArticleId={setCurrentArticleId}
+              />
             </>
           } />
         </Routes>
