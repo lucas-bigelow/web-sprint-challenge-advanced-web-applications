@@ -23,6 +23,7 @@ export default function Articles(props) {
   }, [])
 
   const editArticle = (evt, art_id) => {
+    console.log(art_id)
     evt.preventDefault();
     setCurrentArticleId(art_id);
   }

@@ -120,7 +120,18 @@ export default function App() {
     axiosWithAuth().put(`${articlesUrl}/${article_id}`, article)
       .then(res => {
         setMessage(res.data.message);
+        console.log(res);
+        setArticles(articles.map(art => {
+          if (art.article_id === res.data.article.article_id) {
+            return res.data.article;
+          }
+          return art;
+        }))
+        setCurrentArticleId(null);
         setSpinnerOn(false);
+      })
+      .catch(err => {
+        console.error(err);
       })
   }
 
@@ -134,6 +145,9 @@ export default function App() {
         setMessage(res.data.message);
         setArticles([...articles].filter(article => article_id !== article.article_id))
         setSpinnerOn(false);
+      })
+      .catch(err => {
+        console.error(err);
       })
   }
 
@@ -154,7 +168,7 @@ export default function App() {
           <Route path="articles" element={
             <>
               <ArticleForm 
-                currentArticle={articles[currentArticleId]}
+                currentArticle={articles[articles.findIndex(art => art.article_id === currentArticleId)]}
                 postArticle={postArticle}
                 updateArticle={updateArticle} 
                 setCurrentArticleId={setCurrentArticleId}
